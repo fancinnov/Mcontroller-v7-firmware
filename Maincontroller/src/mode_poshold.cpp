@@ -46,7 +46,7 @@ void mode_poshold(void){
 	float takeoff_climb_rate = 0.0f;
 	float ch7=get_channel_7();
 	update_air_resistance();
-	rangefinder_state.enabled=true;
+
 	// initialize vertical speeds and acceleration
 	pos_control->set_speed_z(-param->pilot_speed_dn.value, param->pilot_speed_up.value);
 	pos_control->set_accel_z(param->pilot_accel_z.value);

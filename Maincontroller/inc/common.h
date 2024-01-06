@@ -407,6 +407,7 @@ typedef struct {
 	bool alt_healthy=false; // true if we can trust the altitude from the rangefinder
 	float alt_cm=0.0f;     // tilt compensated altitude (in cm) from rangefinder
 	uint32_t last_healthy_ms=0;
+	uint32_t last_update_ms=0;
 	LowPassFilterFloat alt_cm_filt; // altitude filter
 	int8_t glitch_count;
 } Rangefinder_state;

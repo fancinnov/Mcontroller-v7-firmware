@@ -54,7 +54,6 @@ void mode_autonav(void){
 	pos_control->set_speed_xy(param->poshold_vel_max.value);
 	pos_control->set_accel_xy(param->poshold_accel_max.value);
 
-	rangefinder_state.enabled=true;
 	// get pilot desired lean angles
 	float target_roll, target_pitch;
 	get_pilot_desired_lean_angles(target_roll, target_pitch, param->angle_max.value, attitude->get_althold_lean_angle_max());
@@ -75,14 +74,6 @@ void mode_autonav(void){
 		target_pitch=0.0f;
 		target_yaw_rate=0.0f;
 		target_climb_rate=0.0f;
-	}
-
-	if(!hit_target_takeoff_alt){
-		if(rangefinder_state.alt_healthy&&abs(rangefinder_state.alt_cm + get_vel_z()*0.2 - takeoff_alt)<10.0f){
-			hit_target_takeoff_alt=true;
-			pos_control->shift_alt_target(-pos_control->get_alt_error());
-			takeoff_stop();
-		}
 	}
 
 	// Alt Hold State Machine Determination
@@ -166,6 +157,13 @@ void mode_autonav(void){
 
 		get_takeoff_climb_rates(target_climb_rate, takeoff_climb_rate);
 
+		if(!hit_target_takeoff_alt){
+			if(rangefinder_state.alt_healthy&&abs(rangefinder_state.alt_cm + get_vel_z()*0.2 - takeoff_alt)<10.0f){
+				hit_target_takeoff_alt=true;
+				takeoff_stop();
+			}
+		}
+
 		// call attitude controller
 		if(ch7>=0.7&&ch7<=1.0){//姿态模式
 			target_yaw=ahrs_yaw_deg();
@@ -180,6 +178,7 @@ void mode_autonav(void){
 			attitude->input_euler_angle_roll_pitch_euler_rate_yaw(pos_control->get_roll(), pos_control->get_pitch(), target_yaw_rate);
 		}
 		// call position controller
+		target_climb_rate = get_surface_tracking_climb_rate(target_climb_rate, pos_control->get_alt_target(), _dt);
 		pos_control->set_alt_target_from_climb_rate_ff(target_climb_rate, _dt, false);
 		pos_control->add_takeoff_climb_rate(takeoff_climb_rate, _dt);
 		pos_control->update_z_controller(get_pos_z(), get_vel_z());
