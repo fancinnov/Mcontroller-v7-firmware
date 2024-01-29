@@ -335,6 +335,10 @@ bool mode_mecanum_init(void);
 void mode_mecanum(void);
 bool mode_perch_init(void);
 void mode_perch(void);
+bool mode_vcopter_init(void);
+void mode_vcopter(void);
+bool mode_airship_init(void);
+void mode_airship(void);
 void mode_ugv_a(void);
 void mode_ugv_v(void);
 
