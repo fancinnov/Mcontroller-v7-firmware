@@ -47,6 +47,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 static bool initialed_task=false;
+static uint32_t time_ms=0;
 
 /* USER CODE END Variables */
 /* Definitions for initTask */
@@ -672,7 +673,15 @@ bool get_task_initialed(void){
 	return initialed_task;
 }
 
+uint32_t get_time_us(void){
+	return time_ms*1000+htim16.Instance->CNT;
+}
+
 //*************TIM Callback**************//
+void TIM_1000HZ_Callback(void){
+	time_ms++;
+}
+
 void TIM_400HZ_Callback(void){
 	osThreadFlagsSet(loop400hzTaskHandle,1);
 }

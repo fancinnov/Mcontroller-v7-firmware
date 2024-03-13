@@ -241,6 +241,9 @@ void set_thr_force_decrease(bool force_decrease);
 void compass_calibrate(void);
 bool get_force_autonav(void);
 
+float log_pitch_rad(void);
+float log_roll_rad(void);
+float log_yaw_rad(void);
 float ahrs_pitch_rad(void);					//俯仰角弧度值
 float ahrs_roll_rad(void);					//滚转角弧度值
 float ahrs_yaw_rad(void);					//偏航角弧度值
