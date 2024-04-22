@@ -424,7 +424,6 @@ typedef struct {
 	bool healthy;
 	float flow_dt;
 	uint32_t last_healthy_ms=0;
-	LowPassFilterVector2f vel_filter;
 	Vector2f rads;
 	Vector2f vel;
 	Vector2f pos;
