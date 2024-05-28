@@ -257,6 +257,8 @@ void update_dataflash(void){
 		dataflash->set_param_vector3f(param->uwb_anchor02_pos.num, param->uwb_anchor02_pos.value);
 		dataflash->set_param_vector3f(param->uwb_anchor03_pos.num, param->uwb_anchor03_pos.value);
 		dataflash->set_param_vector3f(param->uwb_anchor04_pos.num, param->uwb_anchor04_pos.value);
+		dataflash->set_param_float(param->auto_takeoff_speed.num, param->auto_takeoff_speed.value);
+		dataflash->set_param_float(param->baro_temp_offset_gain.num, param->baro_temp_offset_gain.value);
 
 		/* *************************************************
 		* ****************Dev code begin*******************/
@@ -325,6 +327,8 @@ void update_dataflash(void){
 		dataflash->get_param_vector3f(param->uwb_anchor02_pos.num, param->uwb_anchor02_pos.value);
 		dataflash->get_param_vector3f(param->uwb_anchor03_pos.num, param->uwb_anchor03_pos.value);
 		dataflash->get_param_vector3f(param->uwb_anchor04_pos.num, param->uwb_anchor04_pos.value);
+		dataflash->get_param_float(param->auto_takeoff_speed.num, param->auto_takeoff_speed.value);
+		dataflash->get_param_float(param->baro_temp_offset_gain.num, param->baro_temp_offset_gain.value);
 
 		/* *************************************************
 		 * ****************Dev code begin*******************/
@@ -786,6 +790,7 @@ void parse_mavlink_data(mavlink_channel_t chan, uint8_t data, mavlink_message_t*
 							param->uwb_anchor02_pos.value=Vector3f(UWB_POS2_X, UWB_POS2_Y, UWB_POS2_Z);
 							param->uwb_anchor03_pos.value=Vector3f(UWB_POS3_X, UWB_POS3_Y, UWB_POS3_Z);
 							param->uwb_anchor04_pos.value=Vector3f(UWB_POS4_X, UWB_POS4_Y, UWB_POS4_Z);
+							param->auto_takeoff_speed.value=AUTO_TAKEOFF_SPEED;
 
 							dataflash->set_param_float(param->acro_y_expo.num, param->acro_y_expo.value);
 							dataflash->set_param_float(param->acro_yaw_p.num, param->acro_yaw_p.value);
@@ -818,6 +823,7 @@ void parse_mavlink_data(mavlink_channel_t chan, uint8_t data, mavlink_message_t*
 							dataflash->set_param_vector3f(param->uwb_anchor02_pos.num, param->uwb_anchor02_pos.value);
 							dataflash->set_param_vector3f(param->uwb_anchor03_pos.num, param->uwb_anchor03_pos.value);
 							dataflash->set_param_vector3f(param->uwb_anchor04_pos.num, param->uwb_anchor04_pos.value);
+							dataflash->set_param_float(param->auto_takeoff_speed.num, param->auto_takeoff_speed.value);
 
 							dataflash->set_param_float(param->angle_roll_p.num, param->angle_roll_p.value);
 							dataflash->set_param_float(param->angle_pitch_p.num, param->angle_pitch_p.value);
@@ -1283,6 +1289,7 @@ void parse_mavlink_data(mavlink_channel_t chan, uint8_t data, mavlink_message_t*
 							param->uwb_anchor01_pos.value.y=cmd.param3;
 							param->uwb_anchor01_pos.value.z=cmd.param4;
 							dataflash->set_param_vector3f(param->uwb_anchor01_pos.num, param->uwb_anchor01_pos.value);
+							uwb->set_anchor_positon(1, param->uwb_anchor01_pos.value.x, param->uwb_anchor01_pos.value.y, param->uwb_anchor01_pos.value.z);
 							command_long.command=MAV_CMD_DO_SET_PARAMETER;
 							command_long.param1=39.0f;
 							command_long.param2=param->uwb_anchor01_pos.value.x;
@@ -1296,6 +1303,7 @@ void parse_mavlink_data(mavlink_channel_t chan, uint8_t data, mavlink_message_t*
 							param->uwb_anchor02_pos.value.y=cmd.param3;
 							param->uwb_anchor02_pos.value.z=cmd.param4;
 							dataflash->set_param_vector3f(param->uwb_anchor02_pos.num, param->uwb_anchor02_pos.value);
+							uwb->set_anchor_positon(2, param->uwb_anchor02_pos.value.x, param->uwb_anchor02_pos.value.y, param->uwb_anchor02_pos.value.z);
 							command_long.command=MAV_CMD_DO_SET_PARAMETER;
 							command_long.param1=40.0f;
 							command_long.param2=param->uwb_anchor02_pos.value.x;
@@ -1309,6 +1317,7 @@ void parse_mavlink_data(mavlink_channel_t chan, uint8_t data, mavlink_message_t*
 							param->uwb_anchor03_pos.value.y=cmd.param3;
 							param->uwb_anchor03_pos.value.z=cmd.param4;
 							dataflash->set_param_vector3f(param->uwb_anchor03_pos.num, param->uwb_anchor03_pos.value);
+							uwb->set_anchor_positon(3, param->uwb_anchor03_pos.value.x, param->uwb_anchor03_pos.value.y, param->uwb_anchor03_pos.value.z);
 							command_long.command=MAV_CMD_DO_SET_PARAMETER;
 							command_long.param1=41.0f;
 							command_long.param2=param->uwb_anchor03_pos.value.x;
@@ -1322,11 +1331,21 @@ void parse_mavlink_data(mavlink_channel_t chan, uint8_t data, mavlink_message_t*
 							param->uwb_anchor04_pos.value.y=cmd.param3;
 							param->uwb_anchor04_pos.value.z=cmd.param4;
 							dataflash->set_param_vector3f(param->uwb_anchor04_pos.num, param->uwb_anchor04_pos.value);
+							uwb->set_anchor_positon(4, param->uwb_anchor04_pos.value.x, param->uwb_anchor04_pos.value.y, param->uwb_anchor04_pos.value.z);
 							command_long.command=MAV_CMD_DO_SET_PARAMETER;
 							command_long.param1=42.0f;
 							command_long.param2=param->uwb_anchor04_pos.value.x;
 							command_long.param3=param->uwb_anchor04_pos.value.y;
 							command_long.param4=param->uwb_anchor04_pos.value.z;
+							mavlink_msg_command_long_encode(mavlink_system.sysid, mavlink_system.compid, &msg_command_long, &command_long);
+							mavlink_send_buffer(chan, &msg_command_long);
+							break;
+						case 43:
+							param->auto_takeoff_speed.value=cmd.param2;
+							dataflash->set_param_float(param->auto_takeoff_speed.num, param->auto_takeoff_speed.value);
+							command_long.command=MAV_CMD_DO_SET_PARAMETER;
+							command_long.param1=43.0f;
+							command_long.param2=param->auto_takeoff_speed.value;
 							mavlink_msg_command_long_encode(mavlink_system.sysid, mavlink_system.compid, &msg_command_long, &command_long);
 							mavlink_send_buffer(chan, &msg_command_long);
 							break;
@@ -1627,6 +1646,19 @@ void send_mavlink_data(mavlink_channel_t chan)
 	}
 	mavlink_msg_global_position_int_encode(mavlink_system.sysid, mavlink_system.compid, &msg_global_position_int, &global_position_int);
 	mavlink_send_buffer(chan, &msg_global_position_int);
+
+	if(uwb->TAG_ID==1&&param->uwb_tag_max.value>1&&uwb->get_range_distance(1,2)>0){
+		for(uint8_t i=1;i<param->uwb_tag_max.value;i++){
+			for(uint8_t j=i+1;j<=param->uwb_tag_max.value;j++){
+				command_long.command=MAV_CMD_CONDITION_DISTANCE;
+				command_long.param1=(float)i;
+				command_long.param2=(float)j;
+				command_long.param3=(float)uwb->get_range_distance(i,j);//cm
+				mavlink_msg_command_long_encode(mavlink_system.sysid, mavlink_system.compid, &msg_command_long, &command_long);
+				mavlink_send_buffer(chan, &msg_command_long);
+			}
+		}
+	}
 
 	//加速度计校准
 	if(!accel_cal_succeed){
@@ -2015,6 +2047,11 @@ void send_mavlink_param_list(mavlink_channel_t chan)
 	mavlink_msg_command_long_encode(mavlink_system.sysid, mavlink_system.compid, &msg_command_long, &command_long);
 	mavlink_send_buffer(chan, &msg_command_long);
 
+	command_long.param1=43.0f;
+	command_long.param2=param->auto_takeoff_speed.value;
+	mavlink_msg_command_long_encode(mavlink_system.sysid, mavlink_system.compid, &msg_command_long, &command_long);
+	mavlink_send_buffer(chan, &msg_command_long);
+
 	/* *************************************************
 	 * ****************Dev code begin*******************/
 	// Warning! Developer can add your new code here!
@@ -2149,6 +2186,8 @@ void pos_init(void){
 	sdlog->Logger_Read_Gnss();
 	rangefinder_state.alt_cm_filt.set_cutoff_frequency(rangefinder_filt_hz);//tfmini默认频率100hz
 	_uwb_pos_filter.set_cutoff_frequency(uwb_pos_filt_hz);
+	Baro_set_temp_offset_gain(param->baro_temp_offset_gain.value);
+	usb_printf("baro-offset:%f\r\n",param->baro_temp_offset_gain.value);
 }
 
 bool uwb_init(void){
@@ -2503,12 +2542,30 @@ void ahrs_update(void){
 
 static float baro_alt_filt=0,baro_alt_init=0,baro_alt_correct=0;
 static uint16_t init_baro=0;
+static float baro_offset=0.0f, baro_offset_gain=2.0f;
 void update_baro_alt(void){
 	if(init_baro<20){//前20点不要
 		init_baro++;
 		return;
 	}
-	float baro_alt=spl06_data.baro_alt*100.0f;
+	if(is_equal(param->baro_temp_offset_gain.value, 0.0f)){
+		init_baro++;
+		if(init_baro>200){
+			param->baro_temp_offset_gain.value=(spl06_data.baro_alt-spl06_data.baro_alt_init)/(spl06_data.temp-spl06_data.temp_init);
+			dataflash->set_param_float(param->baro_temp_offset_gain.num, param->baro_temp_offset_gain.value);
+			Baro_set_temp_offset_gain(param->baro_temp_offset_gain.value);
+			Buzzer_set_ring_type(BUZZER_INITIALED);
+			usb_printf("baro-offset:%f\r\n",param->baro_temp_offset_gain.value);
+		}
+		return;
+	}
+	if(abs(motors->get_throttle()-motors->get_throttle_hover())<0.05){
+		baro_offset=motors->get_throttle_hover()*baro_offset_gain;
+	}else{
+		baro_offset=0.9*baro_offset+0.1*motors->get_throttle()*baro_offset_gain;
+	}
+
+	float baro_alt=(spl06_data.baro_alt-baro_offset)*100.0f;//螺旋桨气流引起气压偏置
 	if(isnan(baro_alt) || isinf(baro_alt)){
 		return;
 	}
@@ -3179,6 +3236,11 @@ bool arm_motors(void)
 	if (!motors->get_interlock()) {
 		return false;
 	}
+	//TODO: add other pre-arm check
+	if (!ahrs_healthy||is_equal(get_pos_z(),0.0f)||(PREARM_CHECK&&(use_rangefinder&&!rangefinder_state.enabled)&&(!get_gnss_state()))){
+		Buzzer_set_ring_type(BUZZER_ERROR);
+		return false;//传感器异常，禁止电机启动
+	}
     static bool in_arm_motors = false;
 
     // exit immediately if already in this function
@@ -3238,9 +3300,9 @@ void unlock_motors(void){
 		return;
 	}
 	//TODO: add other pre-arm check
-	if (is_equal(get_pos_z(),0.0f)){
+	if (!ahrs_healthy||is_equal(get_pos_z(),0.0f)||(PREARM_CHECK&&(use_rangefinder&&!rangefinder_state.enabled)&&(!get_gnss_state()))){
 		Buzzer_set_ring_type(BUZZER_ERROR);
-		return;//高程计异常，禁止电机启动
+		return;//传感器异常，禁止电机启动
 	}
 	// enable output to motors and servos
 	set_rcout_enable(true);

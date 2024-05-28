@@ -42,6 +42,7 @@ public:
 	uint16_t Anchorvolt[4]={0};
 	int Tagdistance[127]={0};
 	Vector3f uwb_position;
+	float* distance_tag;
 	uint8_t TAG_ID=1;
 	bool uwb_init(void);
 	void uwb_update(void);
@@ -52,6 +53,7 @@ public:
 	uint64_t get_rx_timestamp_u64(void);
 	void final_msg_get_ts(const uint8_t *ts_field, uint32_t *ts);
 	void final_msg_set_ts(uint8_t *ts_field, uint32_t ts);
+	float get_range_distance(uint8_t tag_a_id, uint8_t tag_b_id);
 
 private:
 
@@ -94,7 +96,8 @@ private:
 	uint8_t Master_Release_Semaphore[9] =         	{0x41, 0x88, 0, 0x0, 0xDE, 0xE2, 0, 0, 0};
 	uint8_t Tag_Statistics_response[9] =          	{0x41, 0x88, 0, 0x0, 0xDE, 0xE3, 0, 0, 0};
 	uint8_t Master_Release_Semaphore_comfirm[9] = 	{0x41, 0x88, 0, 0x0, 0xDE, 0xE4, 0, 0, 0};
-	uint8_t comm_msg[RX_BUF_LEN+2];
+	uint8_t* tx_final_msg_prt;
+	uint16_t tx_final_msg_prt_size=0;
 
 	/* Frame sequence number, incremented after each transmission. */
 	uint8_t frame_seq_nb = 0;
@@ -111,22 +114,19 @@ private:
 	uint64_t poll_rx_ts;
 	uint64_t resp_tx_ts;
 	uint64_t final_rx_ts;
+	uint64_t resp_rx_ts_range;
 
 	uint64_t poll_tx_ts_tag;
 	uint64_t resp_rx_ts_tag;
 	uint64_t final_tx_ts_tag;
 
-	uint64_t time_rx_ts;
-	uint64_t time_tx_ts;
-	uint64_t time_tx_ts_real;
-	uint64_t time_sys_ts;
-
-	uint32_t time_rx_ts_32;
-	uint32_t time_tx_ts_32;
+	uint64_t* resp_rx_ts_prt;
 
 	/* Hold copies of computed time of flight and distance here for reference, so reader can examine it at a breakpoint. */
 	double tof;
 	double distance;
+	double distance_temp;
+	double Kg=1.0f;
 
 	/* String used to display measured distance on LCD screen (16 characters maximum). */
 	char dist_str[16] = {0};
@@ -154,11 +154,12 @@ private:
 
 	uint8_t anchor_index = 0;
 	uint8_t tag_index = 0;
+	uint8_t tag_flag = 0;
 
 	uint8_t Semaphore_Enable = 0 ;
 	uint8_t Waiting_TAG_Release_Semaphore = 0;
 	uint32_t frame_len = 0;
-	uint32_t tag_time=0,wait_time=0;
+	uint32_t tag_time=0,wait_time=0,range_time=0;
 	uint8_t last_tag=0;
 	uwb_states uwb_state=idle;
 	uwb_modes uwb_mode=none;

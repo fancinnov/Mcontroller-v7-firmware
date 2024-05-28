@@ -207,6 +207,7 @@
 #define MISSION_VEL_MAX 500.0f		//5m/s
 #define MISSION_ACCEL_MAX 100.0f	//1m/ss
 #define ALT_RETURN	1000.0f			//10m
+#define AUTO_TAKEOFF_SPEED 50.0f	//50cm/s
 #define VOLTAGE_GAIN 1.0f
 #define CURRENT_GAIN 1.0f
 #define UWB_YAW_DELTA_DEG 0.0f
@@ -887,6 +888,18 @@ typedef struct{
 		dataflash_type type=VECTOR3F;
 		Vector3f value={UWB_POS4_X, UWB_POS4_Y, UWB_POS4_Z};
 	}uwb_anchor04_pos;
+
+	struct auto_takeoff_speed{
+		uint16_t num=52;
+		dataflash_type type=FLOAT;
+		float value=AUTO_TAKEOFF_SPEED;
+	}auto_takeoff_speed;
+
+	struct baro_temp_offset_gain{
+		uint16_t num=53;
+		dataflash_type type=FLOAT;
+		float value=0.0f;
+	}baro_temp_offset_gain;
 
 	/* *************************************************
 	 * ****************Dev code begin*******************/
