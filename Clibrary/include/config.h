@@ -103,7 +103,7 @@
 #define USE_CH8_LOCK 0
 
 //是否启用抗风
-#define USE_WIND 1 //启用：1 不启用：0
+#define USE_WIND 0 //启用：1 不启用：0
 
 //是否启用解锁检查
 #define PREARM_CHECK 0 //启用：1 不启用：0
@@ -128,6 +128,6 @@
 #endif
 
 #define VERSION_HARDWARE 718
-#define VERSION_FIRMWARE 2024052801
+#define VERSION_FIRMWARE 2024061301
 
 #endif /* INCLUDE_CONFIG_H_ */

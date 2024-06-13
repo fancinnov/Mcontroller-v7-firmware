@@ -526,6 +526,7 @@ static mavlink_mission_count_t mission_count;
 static mavlink_mission_item_t mission_item;
 static mavlink_log_request_data_t log_request_data;
 static mavlink_command_long_t cmd;
+static mavlink_command_ack_t ack;
 static mavlink_rc_channels_override_t rc_channels;
 static mavlink_attitude_t attitude_mav;
 static mavlink_local_position_ned_cov_t local_position_ned_cov;
@@ -653,6 +654,14 @@ void parse_mavlink_data(mavlink_channel_t chan, uint8_t data, mavlink_message_t*
 				mavlink_msg_log_request_data_decode(msg_received, &log_request_data);
 				if(sdlog->m_Logger_Status==SDLog::Logger_Idle){
 					sd_send_log_file(chan, log_request_data.id-1);
+				}
+				break;
+			case MAVLINK_MSG_ID_COMMAND_ACK:
+				mavlink_msg_command_ack_decode(msg_received, &ack);
+				if(ack.command==MAV_CMD_CONDITION_DISTANCE){
+					if(ack.result>0&&ack.result<=3){
+						uwb->config_uwb((uwb_modes)ack.result, param->uwb_tag_id.value, 1, 1, param->uwb_tag_max.value, 4);
+					}
 				}
 				break;
 			case MAVLINK_MSG_ID_COMMAND_LONG:
@@ -1263,6 +1272,7 @@ void parse_mavlink_data(mavlink_channel_t chan, uint8_t data, mavlink_message_t*
 							command_long.command=MAV_CMD_DO_SET_PARAMETER;
 							command_long.param1=36.0f;
 							command_long.param2=param->uwb_yaw_delta_deg.value;
+							uwb_yaw_delta=-param->uwb_yaw_delta_deg.value*DEG_TO_RAD;
 							mavlink_msg_command_long_encode(mavlink_system.sysid, mavlink_system.compid, &msg_command_long, &command_long);
 							mavlink_send_buffer(chan, &msg_command_long);
 							break;
@@ -1647,7 +1657,7 @@ void send_mavlink_data(mavlink_channel_t chan)
 	mavlink_msg_global_position_int_encode(mavlink_system.sysid, mavlink_system.compid, &msg_global_position_int, &global_position_int);
 	mavlink_send_buffer(chan, &msg_global_position_int);
 
-	if(uwb->TAG_ID==1&&param->uwb_tag_max.value>1&&uwb->get_range_distance(1,2)>0){
+	if((uwb->TAG_ID==1||offboard_connected)&&param->uwb_tag_max.value>1&&uwb->get_range_distance(1,2)>0){
 		for(uint8_t i=1;i<param->uwb_tag_max.value;i++){
 			for(uint8_t j=i+1;j<=param->uwb_tag_max.value;j++){
 				command_long.command=MAV_CMD_CONDITION_DISTANCE;
